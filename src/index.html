@@ -1,10 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<html>
 <body>
+
+<form id="myForm">
+    Name: <input type="text" id="name"><br><br>
+
+    Gender:
+    <input type="radio" name="gender" value="Male"> Male
+    <input type="radio" name="gender" value="Female"> Female<br><br>
+
+    Interests:
+    <input type="checkbox" value="Horror"> Horror
+    <input type="checkbox" value="Crime"> Crime
+    <input type="checkbox" value="Mystery"> Mystery<br><br>
+
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+    document.getElementById("myForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const interests = [];
+        document.querySelectorAll("input[type=checkbox]:checked")
+            .forEach(cb => interests.push(cb.value));
+
+        fetch("https://script.google.com/macros/s/AKfycbz-N9ARy1PbbVHCODZBXHTZ2PVGXqxEUzM4dTn0y5rjLgOI3zflCFGsf1GwVXSNIu-S/exec", {
+            method: "POST",
+            body: JSON.stringify({
+                name: document.getElementById("name").value,
+                gender: document.querySelector("input[name=gender]:checked")?.value,
+                interests: interests
+            })
+        })
+            .then(res => alert("Form submitted successfully!"))
+            .catch(err => alert("Something went wrong"));
+    });
+</script>
 
 </body>
 </html>
