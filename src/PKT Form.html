@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Evaluation Tool</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f5f7fb;
+    }
+
+    .page {
+      display: flex;
+      height: 100vh;
+    }
+
+    /* LEFT PANEL */
+    .left {
+      width: 70%;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    /* RIGHT PANEL */
+    .right {
+      width: 30%;
+      background: #fff;
+      border-left: 1px solid #ddd;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .question {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: none;
+      margin-bottom: 16px;
+    }
+
+    .media-row {
+      display: flex;
+      gap: 16px;
+    }
+
+    .media-box {
+      flex: 1;
+      height: 450px;
+      border: 2px dashed #ccc;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fafafa;
+    }
+
+    .media-box img,
+    .media-box video {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    /* FORM */
+    fieldset {
+      border: none;
+      margin-bottom: 12px;
+    }
+
+    legend {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* MOBILE */
+    @media (max-width: 900px) {
+      .page { flex-direction: column; }
+      .left, .right { width: 100%; height: auto; }
+      .media-row { flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <!-- LEFT PANEL -->
+  <div class="left">
+    <div class="question">
+      <h3 id="questionTitle"></h3>
+      <textarea id="promptBox" readonly></textarea>
+
+      <div class="media-row">
+        <div class="media-box">
+          <img id="questionImage">
+        </div>
+        <div class="media-box">
+          <video id="questionVideo" controls>
+            <source id="questionVideoSrc" type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right">
+
+    <!-- PROGRESS -->
+    <div style="padding:16px">
+      <div id="progressText"></div>
+      <div style="background:#e5e7eb;height:8px;border-radius:4px;margin-top:6px;">
+        <div id="progressBar" style="height:8px;width:0%;background:#2563eb;border-radius:4px;"></div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <form id="evaluationForm" style="padding:16px">
+
+      <div id="userInfo">
+        <h3>User Details</h3>
+        <input id="employeeId" placeholder="Employee ID" required style="width:100%;margin-bottom:8px;">
+        <input id="name" placeholder="Name" required style="width:100%;margin-bottom:8px;">
+        <input id="email" type="email" placeholder="Email" required style="width:100%;margin-bottom:16px;">
+      </div>
+
+      <h3>Evaluation</h3>
+
+      <div id="radioQuestions"></div>
+      <div id="checkboxQuestions"></div>
+
+      <button type="submit">Submit & Next</button>
+    </form>
+  </div>
+
+</div>
+
+<script>
+  const employeeIdInput = document.getElementById("employeeId");
+  const nameInput = document.getElementById("name");
+  const emailInput = document.getElementById("email");
+
+  const TOTAL_PAGES = 10;
+
+  // PAGE CONTENT
+  const pageContent = {
+    1:{title:"Question 1",prompt:"Compare clarity.",image:"assets/image1.jpg",video:"assets/video1.mp4"},
+    2:{title:"Question 2",prompt:"Compare motion.",image:"assets/p2.jpg",video:"assets/p2.mp4"},
+    3:{title:"Question 3",prompt:"Compare lighting.",image:"assets/p3.jpg",video:"assets/p3.mp4"},
+    4:{title:"Question 4",prompt:"Compare artifacts.",image:"assets/p4.jpg",video:"assets/p4.mp4"},
+    5:{title:"Question 5",prompt:"Compare sharpness.",image:"assets/p5.jpg",video:"assets/p5.mp4"},
+    6:{title:"Question 6",prompt:"Compare color accuracy.",image:"assets/p6.jpg",video:"assets/p6.mp4"},
+    7:{title:"Question 7",prompt:"Compare noise.",image:"assets/p7.jpg",video:"assets/p7.mp4"},
+    8:{title:"Question 8",prompt:"Compare realism.",image:"assets/p8.jpg",video:"assets/p8.mp4"},
+    9:{title:"Question 9",prompt:"Compare stability.",image:"assets/p9.jpg",video:"assets/p9.mp4"},
+    10:{title:"Question 10",prompt:"Overall comparison.",image:"assets/p10.jpg",video:"assets/p10.mp4"}
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const page = parseInt(params.get("page") || "1");
+
+  // Progress
+  document.getElementById("progressText").innerText = `Page ${page} of ${TOTAL_PAGES}`;
+  document.getElementById("progressBar").style.width = `${page / TOTAL_PAGES * 100}%`;
+
+  // Load media
+  const c = pageContent[page];
+
+  if (!c) {
+    alert("Configuration error: content missing for page " + page);
+  } else {
+    document.getElementById("questionTitle").innerText = c.title;
+    document.getElementById("promptBox").value = c.prompt;
+    document.getElementById("questionImage").src = c.image;
+    document.getElementById("questionVideoSrc").src = c.video;
+    document.getElementById("questionVideo").load();
+  }
+
+
+  // Hide user info after page 1
+  if (page > 1) {
+    document.getElementById("userInfo").style.display = "none";
+    document.getElementById("name").required = false;
+    document.getElementById("email").required = false;
+  }
+
+
+  // Build questions
+  const radioBox = document.getElementById("radioQuestions");
+  const checkBox = document.getElementById("checkboxQuestions");
+
+  for (let i = 1; i <= 15; i++) {
+    radioBox.innerHTML += `
+    <fieldset>
+      <legend>Q${i}</legend>
+      <label><input type="radio" name="q${i}" value="Image" required> Image</label><br>
+      <label><input type="radio" name="q${i}" value="Video"> Video</label>
+    </fieldset>`;
+  }
+
+  for (let i = 16; i <= 19; i++) {
+    checkBox.innerHTML += `
+    <fieldset>
+      <legend>Q${i}</legend>
+      <label><input type="checkbox" name="q${i}" value="Blur"> Blur</label><br>
+      <label><input type="checkbox" name="q${i}" value="Flicker"> Flicker</label><br>
+      <label><input type="checkbox" name="q${i}" value="Artifacts"> Artifacts</label>
+    </fieldset>`;
+  }
+
+  // Submit
+  document.getElementById("evaluationForm").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    if (page === 1) {
+      sessionStorage.setItem("employeeId", employeeIdInput.value);
+      sessionStorage.setItem("name", nameInput.value);
+      sessionStorage.setItem("email", emailInput.value);
+    }
+
+
+    const payload = {
+      employeeId: sessionStorage.getItem("employeeId"),
+      name: sessionStorage.getItem("name"),
+      email: sessionStorage.getItem("email"),
+      page
+    };
+
+
+    for (let i = 1; i <= 19; i++) {
+      payload[`q${i}`] = [...document.querySelectorAll(`[name="q${i}"]:checked`)]
+              .map(x => x.value).join(", ");
+    }
+
+    await fetch("https://script.google.com/macros/s/AKfycbzLdXLDU0AFaZXjD4FPRDLFqR8KPv7wfaL2jn1Me8IA2XtpTTWC5Rj4TzGQrok5BFEQ/exec", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+
+    if (page < TOTAL_PAGES) {
+      location.href = `?page=${page + 1}`;
+    } else {
+      alert("Done! Thank you 🙏");
+    }
+  });
+</script>
+
+</body>
+</html>
