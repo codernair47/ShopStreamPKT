@@ -193,6 +193,7 @@
     /* -------------------
        DARK MODE STYLES
        ------------------- */
+    /* class 'dark' is added dynamically via JavaScript */
     body.dark {
       background: #0f172a;
       color: #e5e7eb;
@@ -247,7 +248,7 @@
     body.dark .mode-icon:first-child {
       opacity: 0.3;
     }
-
+    /* class 'dark' is added dynamically via JavaScript */
     body:not(.dark) .mode-icon:last-child {
       opacity: 0.3;
     }
@@ -286,16 +287,16 @@
       <h3 id="questionTitle"></h3>
 
       <!-- Prompt text -->
-      <textarea id="promptBox" readonly></textarea>
+      <label for="promptBox"></label><textarea id="promptBox" readonly></textarea>
 
       <!-- Media -->
       <div class="media-row">
         <div class="media-box">
-          <img id="questionImage">
+          <img id="questionImage" alt="Missing Image" src="">
         </div>
         <div class="media-box">
           <video id="questionVideo" controls>
-            <source id="questionVideoSrc" type="video/mp4">
+            <source id="questionVideoSrc" type="video/mp4" src="">
           </video>
         </div>
       </div>
@@ -311,7 +312,7 @@
     <div style="padding:16px">
       <div id="progressText"></div>
       <div style="background:#ddd;height:8px;border-radius:4px;">
-        <div id="progressBar" style="height:8px;width:0%;background:#2563eb;"></div>
+        <div id="progressBar" style="height:8px;width:0;background:#2563eb;"></div>
       </div>
     </div>
 
@@ -321,9 +322,9 @@
       <!-- USER DETAILS (ONLY PAGE 1) -->
       <div id="userInfo">
         <h3>User Details</h3>
-        <input id="employeeId" placeholder="Employee ID" required><br><br>
-        <input id="name" placeholder="Name" required><br><br>
-        <input id="email" type="email" placeholder="Email" required><br><br>
+        <label for="employeeId"></label><input id="employeeId" placeholder="Employee ID" required><br><br>
+        <label for="name"></label><input id="name" placeholder="Name" required><br><br>
+        <label for="email"></label><input id="email" type="email" placeholder="Email" required><br><br>
       </div>
 
       <h3>Evaluation</h3>
